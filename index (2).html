@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة خدمات المحترفين - Pro Service Suite</title>
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+        }
+
+        .light-theme {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --accent: #0284c7;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; transition: background 0.3s, color 0.3s; }
+        body { background-color: var(--bg-body); color: var(--text-main); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        header { display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border); flex-wrap: wrap; gap: 15px; }
+        h1 { font-size: 22px; color: var(--accent); }
+
+        .top-btns { display: flex; gap: 8px; }
+        .btn { padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border); }
+        .btn-accent { background: var(--accent) !important; color: #fff !important; }
+
+        .analytics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--bg-card); padding: 16px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .stat-card p { font-size: 20px; font-weight: bold; color: var(--accent); margin-top: 5px; }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        .form-card { background: var(--bg-card); padding: 22px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-sub); }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-body); color: var(--text-main); outline: none; font-size: 13px; }
+
+        .admin-controls { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .orders-grid { display: grid; gap: 12px; }
+        .order-card { background: var(--bg-card); padding: 18px; border-radius: 12px; border-right: 6px solid var(--accent); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .order-card.urgent { border-right-color: #ef4444; }
+        .order-card.completed { border-right-color: #10b981; }
+
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .order-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        .badge-urgent { background: #ef444422; color: #ef4444; }
+
+        @media print { body * { visibility: hidden; } .print-area, .print-area * { visibility: visible; } .print-area { position: absolute; left: 0; top: 0; width: 100%; color: #000; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>منصة خدمات المحترفين 🚀</h1>
+            <div class="top-btns">
+                <button class="btn" onclick="toggleTheme()">🌓 المظهر</button>
+                <button class="btn btn-accent" id="btnClient" onclick="switchView('client')">واجهة الزبون</button>
+                <button class="btn" id="btnAdmin" onclick="switchView('admin')">لوحة الإدارة 🛠️</button>
+            </div>
+        </header>
+
+        <div class="analytics">
+            <div class="stat-card"><label>الطلبات</label><p id="stTotal">0</p></div>
+            <div class="stat-card"><label>مستعجل 🔥</label><p id="stUrgent">0</p></div>
+            <div class="stat-card"><label>مكتمل ✅</label><p id="stDone">0</p></div>
+            <div class="stat-card"><label>الأرباح المقدرة</label><p id="stRev">$0</p></div>
+        </div>
+
+        <!-- واجهة الزبون -->
+        <div id="clientView" class="view-section active">
+            <div class="form-card">
+                <h2 style="margin-bottom:15px; color:var(--accent);">طلب خدمة جديدة</h2>
+                <div class="form-grid">
+                    <div><label>الاسم الكامل</label><input type="text" id="cName" placeholder="محمد أحمد"></div>
+                    <div><label>رقم التواصل</label><input type="text" id="cPhone" placeholder="010XXXXXXXX"></div>
+                    <div><label>نوع الخدمة</label>
+                        <select id="cType">
+                            <option>تطوير موقع متكامل</option>
+                            <option>تعديل واجهات وديكورات</option>
+                            <option>لوحة تحكم وتطبيق</option>
+                        </select>
+                    </div>
+                    <div><label>الميزانية ($)</label><input type="number" id="cBudget" placeholder="50"></div>
+                    <div><label>الموعد المستهدف</label><input type="date" id="cDeadline"></div>
+                    <div><label>رابط مرفق/نموذج</label><input type="text" id="cLink" placeholder="https://drive.google.com/..."></div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label>تفاصيل الطلب</label>
+                    <textarea id="cDetails" rows="3" placeholder="اكتب التفاصيل بدقة..."></textarea>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label><input type="checkbox" id="cUrgent"> طلب مستعجل (تسليم سريع) 🔥</label>
+                </div>
+                <button class="btn btn-accent" style="width:100%; padding:12px;" onclick="addOrder()">إرسال الطلب فوراً 📤</button>
+            </div>
+        </div>
+
+        <!-- لوحة الإدارة -->
+        <div id="adminView" class="view-section">
+            <div class="admin-controls">
+                <input type="text" id="search" placeholder="🔍 بحث بالاسم أو التفاصيل..." style="max-width:250px;" oninput="render()">
+                <select id="sortSelect" onchange="render()" style="max-width:180px;">
+                    <option value="newest">الأحدث أولاً</option>
+                    <option value="highest">الأعلى ميزانية</option>
+                    <option value="urgent">المستعجل أولاً</option>
+                </select>
+                <div>
+                    <button class="btn" onclick="exportJSON()">تصدير 📥</button>
+                    <button class="btn" onclick="clearData()" style="color:#ef4444;">تصفير 🗑️</button>
+                </div>
+            </div>
+            <div class="orders-grid" id="ordersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let orders = JSON.parse(localStorage.getItem("suite_orders")) || [];
+        
+        function playSound() {
+            let ctx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = ctx.createOscillator();
+            osc.connect(ctx.destination);
+            osc.frequency.value = 587.33; // D5 note
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("light-theme");
+        }
+
+        function switchView(v) {
+            document.querySelectorAll(".view-section").forEach(s => s.classList.remove("active"));
+            document.getElementById(v + 'View').classList.add("active");
+            document.getElementById("btnClient").classList.toggle("btn-accent", v === 'client');
+            document.getElementById("btnAdmin").classList.toggle("btn-accent", v === 'admin');
+        }
+
+        function addOrder() {
+            let name = document.getElementById("cName").value.trim();
+            let details = document.getElementById("cDetails").value.trim();
+            if(!name || !details) return alert("يرجى ملء الحقول الأساسية!");
+
+            let item = {
+                id: Date.now(),
+                name: name,
+                phone: document.getElementById("cPhone").value,
+                type: document.getElementById("cType").value,
+                budget: parseFloat(document.getElementById("cBudget").value) || 0,
+                deadline: document.getElementById("cDeadline").value,
+                link: document.getElementById("cLink").value,
+                details: details,
+                urgent: document.getElementById("cUrgent").checked,
+                status: 'pending',
+                notes: '',
+                date: new Date().toLocaleDateString('ar-EG')
+            };
+
+            orders.unshift(item);
+            save();
+            playSound();
+            alert("تم تسجيل الطلب بنجاح!");
+            
+            // Clear
+            document.getElementById("cName").value = '';
+            document.getElementById("cDetails").value = '';
+        }
+
+        function save() {
+            localStorage.setItem("suite_orders", JSON.stringify(orders));
+            updateStats();
+            render();
+        }
+
+        function updateStats() {
+            document.getElementById("stTotal").innerText = orders.length;
+            document.getElementById("stUrgent").innerText = orders.filter(o => o.urgent).length;
+            document.getElementById("stDone").innerText = orders.filter(o => o.status === 'completed').length;
+            let sum = orders.filter(o => o.status === 'completed').reduce((a, b) => a + b.budget, 0);
+            document.getElementById("stRev").innerText = "$" + sum;
+        }
+
+        function render() {
+            let container = document.getElementById("ordersContainer");
+            let q = document.getElementById("search").value.toLowerCase();
+            let sort = document.getElementById("sortSelect").value;
+            container.innerHTML = "";
+
+            let list = orders.filter(o => o.name.toLowerCase().includes(q) || o.details.toLowerCase().includes(q));
+
+            if(sort === 'highest') list.sort((a,b) => b.budget - a.budget);
+            if(sort === 'urgent') list.sort((a,b) => b.urgent - a.urgent);
+
+            list.forEach(o => {
+                let card = document.createElement("div");
+                card.className = `order-card ${o.urgent ? 'urgent' : ''} ${o.status === 'completed' ? 'completed' : ''}`;
+                card.innerHTML = `
+                    <div class="order-header">
+                        <strong>${o.name} <span style="font-weight:normal; font-size:12px; color:var(--text-sub);">(${o.type})</span></strong>
+                        <div>
+                            ${o.urgent ? '<span class="badge badge-urgent">مستعجل 🔥</span>' : ''}
+                            <span style="color:var(--accent); font-weight:bold;">$${o.budget}</span>
+                        </div>
+                    </div>
+                    <p style="font-size:13px; margin-bottom:8px;">${o.details}</p>
+                    <div style="font-size:11px; color:var(--text-sub); margin-bottom:8px;">
+                        📅 التسليم: ${o.deadline || 'غير محدد'} | 📱 ${o.phone} | 🔗 ${o.link ? `<a href="${o.link}" target="_blank" style="color:var(--accent)">رابط المرفق</a>` : 'لا يوجد'}
+                    </div>
+                    <input type="text" placeholder="ملاحظات الأدمن الخاصة..." value="${o.notes}" onchange="setNote(${o.id}, this.value)" style="margin-bottom:8px; font-size:11px;">
+                    <div class="order-actions">
+                        <button class="btn" onclick="setStatus(${o.id}, 'completed')">إكمال ✅</button>
+                        <button class="btn" onclick="copyData('${o.name}', '${o.phone}')">نسخ 📋</button>
+                        <button class="btn" onclick="printCard(${o.id})">طباعة 🖨️</button>
+                        <button class="btn" onclick="del(${o.id})" style="color:#ef4444;">حذف 🗑️</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setStatus(id, s) {
+            let o = orders.find(x => x.id === id);
+            if(o) { o.status = s; save(); }
+        }
+
+        function setNote(id, val) {
+            let o = orders.find(x => x.id === id);
+            if(o) { o.notes = val; localStorage.setItem("suite_orders", JSON.stringify(orders)); }
+        }
+
+        function del(id) {
+            if(confirm("حذف الطلب؟")) { orders = orders.filter(x => x.id !== id); save(); }
+        }
+
+        function copyData(n, p) {
+            navigator.clipboard.writeText(`العميل: ${n}\nالهاتف: ${p}`);
+            alert("تم نسخ البيانات!");
+        }
+
+        function printCard(id) {
+            let o = orders.find(x => x.id === id);
+            let w = window.open();
+            w.document.write(`<div dir="rtl" style="font-family:sans-serif; padding:30px;"><h2>فاتورة طلب #${o.id}</h2><hr><p>العميل: ${o.name}</p><p>الخدمة: ${o.type}</p><p>المبلغ: $${o.budget}</p></div>`);
+            w.print();
+            w.close();
+        }
+
+        function exportJSON() {
+            let blob = new Blob([JSON.stringify(orders)], {type: "application/json"});
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "data.json";
+            a.click();
+        }
+
+        function clearData() {
+            if(confirm("مسح كل البيانات؟")) { orders = []; save(); }
+        }
+
+        updateStats();
+        render();
+    </script>
+</body>
+</html>
